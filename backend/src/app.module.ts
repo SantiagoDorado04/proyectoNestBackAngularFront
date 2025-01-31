@@ -7,6 +7,7 @@ import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_USER, DB_PORT} from './config/con
 import { ProductoModule } from './producto/producto.module';
 import { ProductoEntity } from './producto/producto.entity';
 import { SlackModule } from './slack/slack.module';
+import { EstablecimientoEntity } from './establecimiento/establecimiento.entity';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { SlackModule } from './slack/slack.module';
           username: configService.get<string>(DB_USER),
           password: configService.get<string>(DB_PASSWORD),
           database: configService.get<string>(DB_DATABASE),
-          entities: [ProductoEntity],
+          entities: [ProductoEntity, EstablecimientoEntity],
           synchronize: true,
           logging: false};
       },

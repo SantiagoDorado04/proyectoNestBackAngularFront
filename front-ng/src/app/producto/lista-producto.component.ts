@@ -11,14 +11,14 @@ import Swal from 'sweetalert2';
   standalone: false
 })
 export class ListaProductoComponent {
-  productos: any[] = [];  
-  totalItems: number = 0; 
-  page: number = 1;       
-  lastPage: number = 1;       
-  limit: number = 10;  
+  productos: any[] = [];
+  totalItems: number = 0;
+  page: number = 1;
+  lastPage: number = 1;
+  limit: number = 10;
   listaVacia: boolean = false;
 
-  constructor(private productoService: ProductoService) {}
+  constructor(private productoService: ProductoService) { }
 
   ngOnInit(): void {
     this.cargarProductos();
@@ -27,13 +27,13 @@ export class ListaProductoComponent {
     this.productoService.lista(this.page, this.limit).subscribe(
       (data) => {
         // console.log('Datos recibidos en Angular:', data);
-  
+
         this.totalItems = data.total;  // Total of products
         this.productos = data.productos; // Products of the actual page, no se como sea en ingles xdxd
-  
+
         // number of pages of the back
         this.lastPage = Math.ceil(this.totalItems / this.limit);
-  
+
         this.listaVacia = this.productos.length === 0;
       },
       (err) => {
@@ -42,7 +42,7 @@ export class ListaProductoComponent {
       }
     );
   }
-  
+
 
   siguiente(): void {
     if (this.page < this.lastPage) {
@@ -64,6 +64,15 @@ export class ListaProductoComponent {
       this.cargarProductos();  // charge the products of the new page
     }
   }
+
+  // Esta función calcula el rango de páginas que se deben mostrar.
+  getPaginaRango(): number[] {
+    const rango = 5; // Número de páginas a mostrar
+    const inicio = Math.max(1, this.page - Math.floor(rango / 2));
+    const fin = Math.min(this.lastPage, inicio + rango - 1);
+    return Array.from({ length: fin - inicio + 1 }, (_, i) => inicio + i);
+  }
+
 
   borrar(id: number): void {
     Swal.fire({

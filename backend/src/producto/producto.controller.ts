@@ -14,8 +14,8 @@ export class ProductoController {
         @Query('limit', ParseIntPipe) limit: number = 10
     ) {
         const result = await this.productoService.getAll(page, limit);
-        console.log('Respuesta paginada:', result); // 👈 Verifica lo que devuelve
-        console.log('Parámetros recibidos:', { page, limit });
+        // console.log('Respuesta paginada:', result); // 👈 Verifica lo que devuelve
+        // console.log('Parámetros recibidos:', { page, limit });
 
         return result;
     }
