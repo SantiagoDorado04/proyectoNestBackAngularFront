@@ -27,15 +27,14 @@
 
   <div class="pagination">
     <button class="btn btn-primary" (click)="anterior()" [disabled]="page === 1">Anterior</button>
-    
-    <!-- Números de página -->
-    <ng-container *ngFor="let p of [].constructor(lastPage); let i = index">
-      <button class="btn btn-outline-primary" (click)="cambiarPagina(i + 1)" 
-              [class.active]="i + 1 === page">{{ i + 1 }}</button>
+
+    <!-- Rango de páginas -->
+    <ng-container *ngFor="let p of getPaginaRango()">
+      <button class="btn btn-outline-primary" (click)="cambiarPagina(p)" [class.active]="p === page">{{ p }}</button>
     </ng-container>
+
+    <span>Página {{ page }} de {{ lastPage }}</span>
     <button class="btn btn-primary" (click)="siguiente()" [disabled]="page === lastPage">Siguiente</button>
-    <br>
-    <p><span>Página {{ page }} de {{ lastPage }}</span></p>
   </div>
 </div>
 

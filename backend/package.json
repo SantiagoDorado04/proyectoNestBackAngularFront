@@ -6,6 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+  "migrate": "npx typeorm migration:run -d src/data-source.ts",
+    "migration:create": "npx ts-node node_modules/.bin/typeorm migration:create -n",
+    "migration:revert": "npx ts-node node_modules/.bin/typeorm migration:revert",
     "seed": "ts-node -r tsconfig-paths/register src/seeder.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

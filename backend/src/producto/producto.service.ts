@@ -19,10 +19,10 @@ export class ProductoService {
         });
 
         return {
-            productos: productos || [],  // 👈 Retornar un array vacío si no hay productos
+            productos: productos || [],  // return empty array if this doesnt have products
             total: total || 0,
             page,
-            lastPage: Math.ceil(total / limit) || 1, // 👈 Asegurar que al menos tenga 1 página
+            lastPage: Math.ceil(total / limit) || 1, // at least have one page
         };
     }
 
