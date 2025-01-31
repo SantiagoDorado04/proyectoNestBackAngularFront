@@ -10,30 +10,59 @@ import Swal from 'sweetalert2';
   styleUrl: './lista-producto.component.scss',
   standalone: false
 })
-export class ListaProductoComponent implements OnInit {
+export class ListaProductoComponent {
+  productos: any[] = [];  
+  totalItems: number = 0; 
+  page: number = 1;       
+  lastPage: number = 1;       
+  limit: number = 10;  
+  listaVacia: boolean = false;
 
-  productos: Producto[] = [];
-
-  listaVacia = undefined;
-
-  constructor(
-    private productoService: ProductoService,
-  ) { }
+  constructor(private productoService: ProductoService) {}
 
   ngOnInit(): void {
     this.cargarProductos();
   }
-
   cargarProductos(): void {
-    this.productoService.lista().subscribe(
-      data => {
-        this.productos = data;
-        this.listaVacia = undefined;
+    this.productoService.lista(this.page, this.limit).subscribe(
+      (data) => {
+        // console.log('Datos recibidos en Angular:', data);
+  
+        this.totalItems = data.total;  // Total of products
+        this.productos = data.productos; // Products of the actual page, no se como sea en ingles xdxd
+  
+        // number of pages of the back
+        this.lastPage = Math.ceil(this.totalItems / this.limit);
+  
+        this.listaVacia = this.productos.length === 0;
       },
-      err => {
-        this.listaVacia = err.error.message;
+      (err) => {
+        console.error('Error en la petición:', err);
+        this.listaVacia = true;
       }
     );
+  }
+  
+
+  siguiente(): void {
+    if (this.page < this.lastPage) {
+      this.page++;
+      this.cargarProductos();  // this charge the products of the next page, modifique the number of page to show the products
+    }
+  }
+
+  anterior(): void {
+    if (this.page > 1) {
+      this.page--;
+      this.cargarProductos();  // this charge the products of the previous page, modifique the number of page to show the products
+    }
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina >= 1 && pagina <= this.lastPage) {
+      this.page = pagina;
+      this.cargarProductos();  // charge the products of the new page
+    }
   }
 
   borrar(id: number): void {

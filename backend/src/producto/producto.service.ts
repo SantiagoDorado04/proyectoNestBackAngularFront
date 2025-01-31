@@ -12,21 +12,27 @@ export class ProductoService {
         @InjectRepository(ProductoEntity) private productoRepository: ProductoRepository
     ) { }
 
-    async getAll(): Promise<ProductoEntity[]> {
-        const list = await this.productoRepository.find()
-        if (!list.length) {
-            throw new NotFoundException(new MessageDto (`la lista esta vacia`))
-        }
+    async getAll(page: number = 1, limit: number = 10): Promise<any> {
+        const [productos, total] = await this.productoRepository.findAndCount({
+            skip: (page - 1) * limit,
+            take: limit,
+        });
 
-        return list;
+        return {
+            productos: productos || [],  // 👈 Retornar un array vacío si no hay productos
+            total: total || 0,
+            page,
+            lastPage: Math.ceil(total / limit) || 1, // 👈 Asegurar que al menos tenga 1 página
+        };
     }
+
 
     async findById(id: number): Promise<ProductoEntity> {
         const producto = await this.productoRepository.findOne({
             where: { id },
         });
         if (!producto) {
-            throw new NotFoundException(new MessageDto (`producto no encontrado`))
+            throw new NotFoundException(new MessageDto(`producto no encontrado`))
         }
 
         return producto;
@@ -41,20 +47,20 @@ export class ProductoService {
     }
 
     async create(dto: ProductoDto): Promise<any> {
-        if (!dto.nombre) throw new BadRequestException(new MessageDto (`el nombre es obligatorio`));
+        if (!dto.nombre) throw new BadRequestException(new MessageDto(`el nombre es obligatorio`));
 
         const producto = this.productoRepository.create(dto);
         const exists = await this.findByName(dto.nombre);
 
-        if (exists) throw new BadRequestException(new MessageDto (`ese nombre ya existe`));
+        if (exists) throw new BadRequestException(new MessageDto(`ese nombre ya existe`));
 
         await this.productoRepository.save(producto);
-        return new MessageDto (`Producto ${producto.nombre} creado correctamente` );
+        return new MessageDto(`Producto ${producto.nombre} creado correctamente`);
     }
 
 
     async update(id: number, dto: ProductoDto): Promise<any> {
-        if (!dto.nombre) throw new BadRequestException(new MessageDto (`el nombre es obligatorio`));
+        if (!dto.nombre) throw new BadRequestException(new MessageDto(`el nombre es obligatorio`));
 
         const producto = await this.findById(id);
         const exists = await this.productoRepository.findOne({
@@ -64,21 +70,21 @@ export class ProductoService {
             }
         });
 
-        if (exists) throw new BadRequestException(new MessageDto (`ese nombre ya existe`));
+        if (exists) throw new BadRequestException(new MessageDto(`ese nombre ya existe`));
 
-        if (!producto) throw new BadRequestException(new MessageDto (`producto inexistente`));
+        if (!producto) throw new BadRequestException(new MessageDto(`producto inexistente`));
 
         if (dto.nombre) producto.nombre = dto.nombre;
 
         if (dto.precio) producto.precio = dto.precio;
 
         await this.productoRepository.save(producto);
-        return new MessageDto (`producto ${producto.nombre} actualizado correctamente`);
+        return new MessageDto(`producto ${producto.nombre} actualizado correctamente`);
     }
 
     async delete(id: number): Promise<any> {
         const producto = await this.findById(id);
         await this.productoRepository.delete(producto);
-        return new MessageDto (`producto ${producto.nombre} eliminado correctamente`);
+        return new MessageDto(`producto ${producto.nombre} eliminado correctamente`);
     }
 }
