@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ProductoService } from './producto.service';
 import { ProductoDto } from './dto/producto.dto';
 import { whitelist } from 'validator';
@@ -9,22 +9,30 @@ export class ProductoController {
     constructor(private readonly productoService: ProductoService) { }
 
     @Get()
-    async getAll() {
-        return await this.productoService.getAll();
+    async getAll(
+        @Query('page', ParseIntPipe) page: number = 1,
+        @Query('limit', ParseIntPipe) limit: number = 10
+    ) {
+        const result = await this.productoService.getAll(page, limit);
+        console.log('Respuesta paginada:', result); // 👈 Verifica lo que devuelve
+        console.log('Parámetros recibidos:', { page, limit });
+
+        return result;
     }
+    
 
     @Get(':id')
     async getOne(@Param('id', ParseIntPipe) id: number) {
         return await this.productoService.findById(id);
     }
 
-    @UsePipes(new ValidationPipe({whitelist:true}))
+    @UsePipes(new ValidationPipe({ whitelist: true }))
     @Post()
     async create(@Body() dto: ProductoDto) {
         return await this.productoService.create(dto);
     }
 
-    @UsePipes(new ValidationPipe({whitelist:true}))
+    @UsePipes(new ValidationPipe({ whitelist: true }))
     @Put(':id')
     async update(@Param('id') id: number, @Body() dto: ProductoDto) {
         return this.productoService.update(id, dto);
