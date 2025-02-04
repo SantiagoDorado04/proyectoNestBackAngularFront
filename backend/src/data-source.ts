@@ -1,27 +1,28 @@
-// src/config/data-source.ts
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
-import { DataSource } from 'typeorm';
-import { ProductoEntity } from './producto/producto.entity';
-import { EstablecimientoEntity } from './establecimiento/establecimiento.entity'; // Asegúrate de importar la entidad Establecimiento
+ConfigModule.forRoot({
+  envFilePath: `.${process.env.NODE_ENV}.env`,
+});
 
-const dbPort = process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432; // Usar un valor predeterminado de 5432 si no se define
+const configService = new ConfigService();
 
-export const AppDataSource = new DataSource({
-    type: 'postgres', // Usando PostgreSQL como base de datos
-    host: process.env.DB_HOST,
-    port: dbPort, // Usando la variable con la comprobación
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    entities: [ProductoEntity, EstablecimientoEntity],
-    synchronize: false,
-    logging: true,
-  });
 
-  AppDataSource.initialize()
-  .then(() => {
-    console.log("Data Source has been initialized!");
-  })
-  .catch((err) => {
-    console.error("Error during Data Source initialization", err);
-  });
+export const DataSourceConfig: DataSourceOptions = {
+  type: 'postgres',
+  host: configService.get('DB_HOST'),
+  port: configService.get('DB_PORT'),
+  username: configService.get('DB_USER'),
+  password: configService.get('DB_PASSWORD'),
+  database: configService.get('DB_DATABASE'),
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+  synchronize: true,
+  migrationsRun: true,
+  logging: false,
+  namingStrategy: new SnakeNamingStrategy(),
+};
+
+
+export const AppDS = new DataSource(DataSourceConfig);
