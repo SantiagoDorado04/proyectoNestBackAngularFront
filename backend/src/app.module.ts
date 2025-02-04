@@ -8,6 +8,8 @@ import { ProductoModule } from './producto/producto.module';
 import { ProductoEntity } from './producto/producto.entity';
 import { SlackModule } from './slack/slack.module';
 import { EstablecimientoEntity } from './establecimiento/establecimiento.entity';
+import { UsersModule } from './users/users.module';
+import { DataSourceConfig } from './data-source';
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { EstablecimientoEntity } from './establecimiento/establecimiento.entity'
       isGlobal:true
     }),
     TypeOrmModule.forRootAsync({
+      ...DataSourceConfig,
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
         const dbPort = configService.get<number>(DB_PORT);
@@ -32,13 +35,15 @@ import { EstablecimientoEntity } from './establecimiento/establecimiento.entity'
           password: configService.get<string>(DB_PASSWORD),
           database: configService.get<string>(DB_DATABASE),
           entities: [ProductoEntity, EstablecimientoEntity],
-          synchronize: true,
+          migrations: ['dist/migrations/*.js'], // Asegúrate que coincida con la carpeta de compilación
+          synchronize: false,
           logging: false};
       },
       inject: [ConfigService],
     }),
     ProductoModule,
     SlackModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

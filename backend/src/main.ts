@@ -4,6 +4,10 @@ import { ConfigService } from '@nestjs/config';
 import { SERVER_PORT } from './config/constants';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   const configService = app.get(ConfigService);
